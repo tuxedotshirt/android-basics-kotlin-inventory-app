@@ -31,14 +31,14 @@ import com.example.inventory.databinding.ItemListFragmentBinding
  */
 class ItemListFragment : Fragment() {
 
-    private var _binding: ItemListFragmentBinding? = null
-    private val binding get() = _binding!!
-
     private val viewModel: InventoryViewModel by activityViewModels {
         InventoryViewModelFactory(
             (activity?.application as InventoryApplication).database.itemDao()
         )
     }
+
+    private var _binding: ItemListFragmentBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +51,12 @@ class ItemListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = ItemListAdapter{ }
+
+        val adapter = ItemListAdapter{
+            val action =   ItemListFragmentDirections.actionItemListFragmentToItemDetailFragment(it.id)
+            this.findNavController().navigate(action)
+        }
+        binding.recyclerView.adapter = adapter
         viewModel.allItems.observe(this.viewLifecycleOwner) { items ->
             items.let {
                 adapter.submitList(it)
